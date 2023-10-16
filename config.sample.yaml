@@ -1,0 +1,11 @@
+admin_users:
+  - root
+  - sadeq
+user_limit:
+  guest: 1
+  anis: 1
+  farnaz: 2
+  sepidar: 1
+pam_config:
+  debug: false
+  pseudo: true

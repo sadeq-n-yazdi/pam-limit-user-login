@@ -1,0 +1,18 @@
+{
+  // Admin users
+  "admin-users": [
+    "root",
+    "sadeq"
+  ],
+
+  // User limits
+  "user-limit": {
+    "guest": 1,
+    "anis": 1,
+    "farnaz": 2,
+    "sepidar": 3
+  },
+  "pam-config":
+    "debug": false,
+    "pseudo": true
+}
