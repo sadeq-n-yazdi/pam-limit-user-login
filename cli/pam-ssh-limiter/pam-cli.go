@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"pam-limit-user-login/internal/logger"
-	"strconv"
 	"strings"
 
 	"pam-limit-user-login/internal/configurations"
@@ -79,26 +78,31 @@ func main() {
 		os.Exit(0)
 	}
 	var userId int
+	userId, err = utilities.GetUserID(username)
+	logger.GetLogger().Debugln("GetUserID:", username, userId, err)
 	// Admin users have no restriction
-	if userId, err := strconv.Atoi(username); err == nil {
-		logger.GetLogger().Debugln(username, userId, err)
-		logger.GetLogger().Debugln("the user passed by id", userId)
-		usernameFromId, userFound := utilities.GetUserNameFromUserId(userId, false)
-		if userFound {
-			username = usernameFromId
-		} else {
-			logger.GetLogger().Warnln("User with id", userId, "not found")
-		}
-	} else {
-		logger.GetLogger().Debugln(userId, "is not numeric", err)
-	}
+	//if userId, err := strconv.Atoi(username); err == nil {
+	//	logger.GetLogger().Debugln(username, userId, err)
+	//	logger.GetLogger().Debugln("the user passed by id", userId)
+	//	usernameFromId, userFound := utilities.GetUserNameFromUserId(userId, false)
+	//	if userFound {
+	//		username = usernameFromId
+	//	} else {
+	//		logger.GetLogger().Warnln("User with id", userId, "not found")
+	//	}
+	//} else {
+	//	logger.GetLogger().Debugln(userId, "is not numeric", err)
+	//}
 
-	if userId < 1000 || configurations.AdminUsers.IsInList(username) {
+	if userId < 512 || configurations.AdminUsers.IsInList(username) {
+		if userId < 512 {
+			logger.GetLogger().Debugln("User is below 512")
+		}
 		logger.GetLogger().Infoln("Access granted to special users. You can log in.")
 		utilities.ReturnExitCode(config.PamConfig, 0)
 	}
-	serviceName := parameters[2]
-	if !strings.Contains(strings.ToLower(serviceName), "ssh") {
+	serviceName := os.Getenv("PAM_SERVICE")
+	if !strings.Contains(strings.ToLower(serviceName), "sshd") {
 		logger.GetLogger().Infoln("This is not ssh login so access granted")
 		utilities.ReturnExitCode(config.PamConfig, 0)
 	}
