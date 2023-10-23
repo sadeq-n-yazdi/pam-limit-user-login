@@ -80,19 +80,6 @@ func main() {
 	var userId int
 	userId, err = utilities.GetUserID(username)
 	logger.GetLogger().Debugln("GetUserID:", username, userId, err)
-	// Admin users have no restriction
-	//if userId, err := strconv.Atoi(username); err == nil {
-	//	logger.GetLogger().Debugln(username, userId, err)
-	//	logger.GetLogger().Debugln("the user passed by id", userId)
-	//	usernameFromId, userFound := utilities.GetUserNameFromUserId(userId, false)
-	//	if userFound {
-	//		username = usernameFromId
-	//	} else {
-	//		logger.GetLogger().Warnln("User with id", userId, "not found")
-	//	}
-	//} else {
-	//	logger.GetLogger().Debugln(userId, "is not numeric", err)
-	//}
 
 	if userId < 512 || configurations.AdminUsers.IsInList(username) {
 		if userId < 512 {
@@ -118,26 +105,5 @@ func main() {
 		logger.GetLogger().Infoln("User reached the maximum ")
 		utilities.ReturnExitCode(config.PamConfig, 1)
 	}
-	/*
-		// Keep this part of code for later reference until after first commit
-		tty := parameters[3]
-		rhost := parameters[4]
-		commandLine := parameters[5]
 
-		fmt.Printf("Username: %s\n", username)
-		fmt.Printf("Service Name: %s\n", serviceName)
-		fmt.Printf("TTY: %s\n", tty)
-		fmt.Printf("Remote Host: %s\n", rhost)
-		fmt.Printf("Command Line: %s\n", commandLine)
-
-		Check if username is "root" or "sadeq" and allow login
-		if username == "root" || username == "sadeq" {
-			fmt.Println("Access granted. You can log in.")
-			os.Exit(0) // Exit with success (0) to allow the login
-		}
-
-		fmt.Println("Access denied. You are not authorized to log in.")
-		os.Exit(1) // Exit with failure (non-zero) to deny the login.
-
-	*/
 }

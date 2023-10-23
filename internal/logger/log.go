@@ -11,10 +11,10 @@ func GetLogger() *logrus.Logger {
 	if logger == nil {
 		logger = logrus.New()
 
-		// Set the desired log level (for example, Debug, Info, Warn, Error, Fatal)
+		// Set the desired log level, for example, Debug, Info, Warn, Error, Fatal)
 		logger.SetLevel(lastLogLevel)
 
-		// Define colors for log levels (if you're using a terminal)
+		// Define colours for log levels if you're using a terminal.
 		formatter := &logrus.TextFormatter{
 			ForceColors:   true,
 			FullTimestamp: true,
