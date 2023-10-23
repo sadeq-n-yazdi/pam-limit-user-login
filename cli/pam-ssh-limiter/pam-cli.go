@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/sirupsen/logrus"
+	"io"
 	"os"
 	"pam-limit-user-login/internal/logger"
 	"strconv"
@@ -12,8 +13,19 @@ import (
 )
 
 func main() {
+	file, err := os.OpenFile("/var/log/pam-ssh-limiter.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err == nil {
+		multiWriter := io.MultiWriter(os.Stdout, file)
+		logger.GetLogger().Out = multiWriter
+	} else {
+		logger.GetLogger().Warnln("Failed to log to file, using default stderr")
+	}
+	// Close the file when your app exits
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 	// Replace with your configuration filename extensions: json, jsonc, yaml, yml
-	configFilename := "config.yaml"
+	configFilename := "/etc/pam-ssh-limiter/config.yaml"
 
 	cfgFile := os.Getenv("PAM_SSH_LIMITER_CONFIG")
 	if cfgFile != "" {
@@ -28,7 +40,7 @@ func main() {
 	}
 
 	config := &configurations.Config{}
-	err := configurations.LoadConfigFile(configFilename, config)
+	err = configurations.LoadConfigFile(configFilename, config)
 	if err != nil {
 		logger.GetLogger().Warnf("Oops! Unknown error happened to get config. I will let you continue with default setting! [%s][%v]\n", configFilename, err)
 	} else {
@@ -60,8 +72,12 @@ func main() {
 
 	logger.GetLogger().Debugln(parameters)
 
-	username := parameters[1]
-
+	username := os.Getenv("PAM_USER")
+	systemNameIsSSH := os.Getenv("PAM_SERVICE") == "sshd"
+	if !systemNameIsSSH {
+		logger.GetLogger().Infoln("Not sshd service", os.Getenv("PAM_SERVICE"))
+		os.Exit(0)
+	}
 	var userId int
 	// Admin users have no restriction
 	if userId, err := strconv.Atoi(username); err == nil {
