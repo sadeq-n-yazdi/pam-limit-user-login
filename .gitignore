@@ -351,3 +351,4 @@ tags
 /config.yml
 /config.jsonc
 /config.json
+/cli/pam-ssh-limiter/pam-ssh-limiter
